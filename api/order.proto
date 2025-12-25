@@ -1,0 +1,18 @@
+syntax = "proto3";
+package api;
+option go_package = "./api";
+
+service FlashSaleService {
+    rpc RushBuy(RushBuyRequest) returns (RushBuyResponse);
+}
+
+message RushBuyRequest {
+    int64 user_id = 1;
+    int64 product_id = 2;
+}
+
+message RushBuyResponse {
+    int32 status = 1;
+    string msg = 2;
+    string order_sn = 3;
+}
