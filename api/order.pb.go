@@ -21,28 +21,30 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type RushBuyRequest struct {
+type FlashOrderRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	UserId        int64                  `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	ProductId     int64                  `protobuf:"varint,2,opt,name=product_id,json=productId,proto3" json:"product_id,omitempty"`
+	UserId        uint64                 `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	ProductId     uint64                 `protobuf:"varint,2,opt,name=product_id,json=productId,proto3" json:"product_id,omitempty"`
+	PromoId       uint64                 `protobuf:"varint,3,opt,name=promo_id,json=promoId,proto3" json:"promo_id,omitempty"`
+	Quantity      int32                  `protobuf:"varint,4,opt,name=quantity,proto3" json:"quantity,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *RushBuyRequest) Reset() {
-	*x = RushBuyRequest{}
+func (x *FlashOrderRequest) Reset() {
+	*x = FlashOrderRequest{}
 	mi := &file_api_order_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *RushBuyRequest) String() string {
+func (x *FlashOrderRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*RushBuyRequest) ProtoMessage() {}
+func (*FlashOrderRequest) ProtoMessage() {}
 
-func (x *RushBuyRequest) ProtoReflect() protoreflect.Message {
+func (x *FlashOrderRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_api_order_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -54,26 +56,100 @@ func (x *RushBuyRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use RushBuyRequest.ProtoReflect.Descriptor instead.
-func (*RushBuyRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use FlashOrderRequest.ProtoReflect.Descriptor instead.
+func (*FlashOrderRequest) Descriptor() ([]byte, []int) {
 	return file_api_order_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *RushBuyRequest) GetUserId() int64 {
+func (x *FlashOrderRequest) GetUserId() uint64 {
 	if x != nil {
 		return x.UserId
 	}
 	return 0
 }
 
-func (x *RushBuyRequest) GetProductId() int64 {
+func (x *FlashOrderRequest) GetProductId() uint64 {
 	if x != nil {
 		return x.ProductId
 	}
 	return 0
 }
 
-type RushBuyResponse struct {
+func (x *FlashOrderRequest) GetPromoId() uint64 {
+	if x != nil {
+		return x.PromoId
+	}
+	return 0
+}
+
+func (x *FlashOrderRequest) GetQuantity() int32 {
+	if x != nil {
+		return x.Quantity
+	}
+	return 0
+}
+
+type OrderRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        uint64                 `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	ProductId     uint64                 `protobuf:"varint,2,opt,name=product_id,json=productId,proto3" json:"product_id,omitempty"`
+	Quantity      int32                  `protobuf:"varint,3,opt,name=quantity,proto3" json:"quantity,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *OrderRequest) Reset() {
+	*x = OrderRequest{}
+	mi := &file_api_order_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *OrderRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*OrderRequest) ProtoMessage() {}
+
+func (x *OrderRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_order_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use OrderRequest.ProtoReflect.Descriptor instead.
+func (*OrderRequest) Descriptor() ([]byte, []int) {
+	return file_api_order_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *OrderRequest) GetUserId() uint64 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+func (x *OrderRequest) GetProductId() uint64 {
+	if x != nil {
+		return x.ProductId
+	}
+	return 0
+}
+
+func (x *OrderRequest) GetQuantity() int32 {
+	if x != nil {
+		return x.Quantity
+	}
+	return 0
+}
+
+type OrderResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Status        int32                  `protobuf:"varint,1,opt,name=status,proto3" json:"status,omitempty"`
 	Msg           string                 `protobuf:"bytes,2,opt,name=msg,proto3" json:"msg,omitempty"`
@@ -82,21 +158,21 @@ type RushBuyResponse struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *RushBuyResponse) Reset() {
-	*x = RushBuyResponse{}
-	mi := &file_api_order_proto_msgTypes[1]
+func (x *OrderResponse) Reset() {
+	*x = OrderResponse{}
+	mi := &file_api_order_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *RushBuyResponse) String() string {
+func (x *OrderResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*RushBuyResponse) ProtoMessage() {}
+func (*OrderResponse) ProtoMessage() {}
 
-func (x *RushBuyResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_order_proto_msgTypes[1]
+func (x *OrderResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_order_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -107,26 +183,26 @@ func (x *RushBuyResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use RushBuyResponse.ProtoReflect.Descriptor instead.
-func (*RushBuyResponse) Descriptor() ([]byte, []int) {
-	return file_api_order_proto_rawDescGZIP(), []int{1}
+// Deprecated: Use OrderResponse.ProtoReflect.Descriptor instead.
+func (*OrderResponse) Descriptor() ([]byte, []int) {
+	return file_api_order_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *RushBuyResponse) GetStatus() int32 {
+func (x *OrderResponse) GetStatus() int32 {
 	if x != nil {
 		return x.Status
 	}
 	return 0
 }
 
-func (x *RushBuyResponse) GetMsg() string {
+func (x *OrderResponse) GetMsg() string {
 	if x != nil {
 		return x.Msg
 	}
 	return ""
 }
 
-func (x *RushBuyResponse) GetOrderSn() string {
+func (x *OrderResponse) GetOrderSn() string {
 	if x != nil {
 		return x.OrderSn
 	}
@@ -137,17 +213,25 @@ var File_api_order_proto protoreflect.FileDescriptor
 
 const file_api_order_proto_rawDesc = "" +
 	"\n" +
-	"\x0fapi/order.proto\x12\x03api\"H\n" +
-	"\x0eRushBuyRequest\x12\x17\n" +
-	"\auser_id\x18\x01 \x01(\x03R\x06userId\x12\x1d\n" +
+	"\x0fapi/order.proto\x12\x03api\"\x82\x01\n" +
+	"\x11FlashOrderRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\x04R\x06userId\x12\x1d\n" +
 	"\n" +
-	"product_id\x18\x02 \x01(\x03R\tproductId\"V\n" +
-	"\x0fRushBuyResponse\x12\x16\n" +
+	"product_id\x18\x02 \x01(\x04R\tproductId\x12\x19\n" +
+	"\bpromo_id\x18\x03 \x01(\x04R\apromoId\x12\x1a\n" +
+	"\bquantity\x18\x04 \x01(\x05R\bquantity\"b\n" +
+	"\fOrderRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\x04R\x06userId\x12\x1d\n" +
+	"\n" +
+	"product_id\x18\x02 \x01(\x04R\tproductId\x12\x1a\n" +
+	"\bquantity\x18\x03 \x01(\x05R\bquantity\"T\n" +
+	"\rOrderResponse\x12\x16\n" +
 	"\x06status\x18\x01 \x01(\x05R\x06status\x12\x10\n" +
 	"\x03msg\x18\x02 \x01(\tR\x03msg\x12\x19\n" +
-	"\border_sn\x18\x03 \x01(\tR\aorderSn2H\n" +
-	"\x10FlashSaleService\x124\n" +
-	"\aRushBuy\x12\x13.api.RushBuyRequest\x1a\x14.api.RushBuyResponseB\aZ\x05./apib\x06proto3"
+	"\border_sn\x18\x03 \x01(\tR\aorderSn2\x84\x01\n" +
+	"\fOrderService\x12>\n" +
+	"\x10CreateFlashOrder\x12\x16.api.FlashOrderRequest\x1a\x12.api.OrderResponse\x124\n" +
+	"\vCreateOrder\x12\x11.api.OrderRequest\x1a\x12.api.OrderResponseB\aZ\x05./apib\x06proto3"
 
 var (
 	file_api_order_proto_rawDescOnce sync.Once
@@ -161,16 +245,19 @@ func file_api_order_proto_rawDescGZIP() []byte {
 	return file_api_order_proto_rawDescData
 }
 
-var file_api_order_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_api_order_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_api_order_proto_goTypes = []any{
-	(*RushBuyRequest)(nil),  // 0: api.RushBuyRequest
-	(*RushBuyResponse)(nil), // 1: api.RushBuyResponse
+	(*FlashOrderRequest)(nil), // 0: api.FlashOrderRequest
+	(*OrderRequest)(nil),      // 1: api.OrderRequest
+	(*OrderResponse)(nil),     // 2: api.OrderResponse
 }
 var file_api_order_proto_depIdxs = []int32{
-	0, // 0: api.FlashSaleService.RushBuy:input_type -> api.RushBuyRequest
-	1, // 1: api.FlashSaleService.RushBuy:output_type -> api.RushBuyResponse
-	1, // [1:2] is the sub-list for method output_type
-	0, // [0:1] is the sub-list for method input_type
+	0, // 0: api.OrderService.CreateFlashOrder:input_type -> api.FlashOrderRequest
+	1, // 1: api.OrderService.CreateOrder:input_type -> api.OrderRequest
+	2, // 2: api.OrderService.CreateFlashOrder:output_type -> api.OrderResponse
+	2, // 3: api.OrderService.CreateOrder:output_type -> api.OrderResponse
+	2, // [2:4] is the sub-list for method output_type
+	0, // [0:2] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name
@@ -187,7 +274,7 @@ func file_api_order_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_api_order_proto_rawDesc), len(file_api_order_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   3,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

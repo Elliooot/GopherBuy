@@ -19,101 +19,139 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	FlashSaleService_RushBuy_FullMethodName = "/api.FlashSaleService/RushBuy"
+	OrderService_CreateFlashOrder_FullMethodName = "/api.OrderService/CreateFlashOrder"
+	OrderService_CreateOrder_FullMethodName      = "/api.OrderService/CreateOrder"
 )
 
-// FlashSaleServiceClient is the client API for FlashSaleService service.
+// OrderServiceClient is the client API for OrderService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type FlashSaleServiceClient interface {
-	RushBuy(ctx context.Context, in *RushBuyRequest, opts ...grpc.CallOption) (*RushBuyResponse, error)
+type OrderServiceClient interface {
+	CreateFlashOrder(ctx context.Context, in *FlashOrderRequest, opts ...grpc.CallOption) (*OrderResponse, error)
+	CreateOrder(ctx context.Context, in *OrderRequest, opts ...grpc.CallOption) (*OrderResponse, error)
 }
 
-type flashSaleServiceClient struct {
+type orderServiceClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewFlashSaleServiceClient(cc grpc.ClientConnInterface) FlashSaleServiceClient {
-	return &flashSaleServiceClient{cc}
+func NewOrderServiceClient(cc grpc.ClientConnInterface) OrderServiceClient {
+	return &orderServiceClient{cc}
 }
 
-func (c *flashSaleServiceClient) RushBuy(ctx context.Context, in *RushBuyRequest, opts ...grpc.CallOption) (*RushBuyResponse, error) {
+func (c *orderServiceClient) CreateFlashOrder(ctx context.Context, in *FlashOrderRequest, opts ...grpc.CallOption) (*OrderResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(RushBuyResponse)
-	err := c.cc.Invoke(ctx, FlashSaleService_RushBuy_FullMethodName, in, out, cOpts...)
+	out := new(OrderResponse)
+	err := c.cc.Invoke(ctx, OrderService_CreateFlashOrder_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// FlashSaleServiceServer is the server API for FlashSaleService service.
-// All implementations must embed UnimplementedFlashSaleServiceServer
-// for forward compatibility.
-type FlashSaleServiceServer interface {
-	RushBuy(context.Context, *RushBuyRequest) (*RushBuyResponse, error)
-	mustEmbedUnimplementedFlashSaleServiceServer()
+func (c *orderServiceClient) CreateOrder(ctx context.Context, in *OrderRequest, opts ...grpc.CallOption) (*OrderResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(OrderResponse)
+	err := c.cc.Invoke(ctx, OrderService_CreateOrder_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
-// UnimplementedFlashSaleServiceServer must be embedded to have
+// OrderServiceServer is the server API for OrderService service.
+// All implementations must embed UnimplementedOrderServiceServer
+// for forward compatibility.
+type OrderServiceServer interface {
+	CreateFlashOrder(context.Context, *FlashOrderRequest) (*OrderResponse, error)
+	CreateOrder(context.Context, *OrderRequest) (*OrderResponse, error)
+	mustEmbedUnimplementedOrderServiceServer()
+}
+
+// UnimplementedOrderServiceServer must be embedded to have
 // forward compatible implementations.
 //
 // NOTE: this should be embedded by value instead of pointer to avoid a nil
 // pointer dereference when methods are called.
-type UnimplementedFlashSaleServiceServer struct{}
+type UnimplementedOrderServiceServer struct{}
 
-func (UnimplementedFlashSaleServiceServer) RushBuy(context.Context, *RushBuyRequest) (*RushBuyResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method RushBuy not implemented")
+func (UnimplementedOrderServiceServer) CreateFlashOrder(context.Context, *FlashOrderRequest) (*OrderResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateFlashOrder not implemented")
 }
-func (UnimplementedFlashSaleServiceServer) mustEmbedUnimplementedFlashSaleServiceServer() {}
-func (UnimplementedFlashSaleServiceServer) testEmbeddedByValue()                          {}
+func (UnimplementedOrderServiceServer) CreateOrder(context.Context, *OrderRequest) (*OrderResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateOrder not implemented")
+}
+func (UnimplementedOrderServiceServer) mustEmbedUnimplementedOrderServiceServer() {}
+func (UnimplementedOrderServiceServer) testEmbeddedByValue()                      {}
 
-// UnsafeFlashSaleServiceServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to FlashSaleServiceServer will
+// UnsafeOrderServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to OrderServiceServer will
 // result in compilation errors.
-type UnsafeFlashSaleServiceServer interface {
-	mustEmbedUnimplementedFlashSaleServiceServer()
+type UnsafeOrderServiceServer interface {
+	mustEmbedUnimplementedOrderServiceServer()
 }
 
-func RegisterFlashSaleServiceServer(s grpc.ServiceRegistrar, srv FlashSaleServiceServer) {
-	// If the following call panics, it indicates UnimplementedFlashSaleServiceServer was
+func RegisterOrderServiceServer(s grpc.ServiceRegistrar, srv OrderServiceServer) {
+	// If the following call panics, it indicates UnimplementedOrderServiceServer was
 	// embedded by pointer and is nil.  This will cause panics if an
 	// unimplemented method is ever invoked, so we test this at initialization
 	// time to prevent it from happening at runtime later due to I/O.
 	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
 		t.testEmbeddedByValue()
 	}
-	s.RegisterService(&FlashSaleService_ServiceDesc, srv)
+	s.RegisterService(&OrderService_ServiceDesc, srv)
 }
 
-func _FlashSaleService_RushBuy_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(RushBuyRequest)
+func _OrderService_CreateFlashOrder_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FlashOrderRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(FlashSaleServiceServer).RushBuy(ctx, in)
+		return srv.(OrderServiceServer).CreateFlashOrder(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: FlashSaleService_RushBuy_FullMethodName,
+		FullMethod: OrderService_CreateFlashOrder_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(FlashSaleServiceServer).RushBuy(ctx, req.(*RushBuyRequest))
+		return srv.(OrderServiceServer).CreateFlashOrder(ctx, req.(*FlashOrderRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// FlashSaleService_ServiceDesc is the grpc.ServiceDesc for FlashSaleService service.
+func _OrderService_CreateOrder_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(OrderRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(OrderServiceServer).CreateOrder(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: OrderService_CreateOrder_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(OrderServiceServer).CreateOrder(ctx, req.(*OrderRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// OrderService_ServiceDesc is the grpc.ServiceDesc for OrderService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var FlashSaleService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "api.FlashSaleService",
-	HandlerType: (*FlashSaleServiceServer)(nil),
+var OrderService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "api.OrderService",
+	HandlerType: (*OrderServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "RushBuy",
-			Handler:    _FlashSaleService_RushBuy_Handler,
+			MethodName: "CreateFlashOrder",
+			Handler:    _OrderService_CreateFlashOrder_Handler,
+		},
+		{
+			MethodName: "CreateOrder",
+			Handler:    _OrderService_CreateOrder_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -1,6 +1,7 @@
 package service
 
 import (
+	"GopherBuy/api"
 	"GopherBuy/internal/model"
 	"GopherBuy/internal/repository"
 	"GopherBuy/pkg/utils"
@@ -8,16 +9,22 @@ import (
 
 type OrderService struct {
 	// dependency injection
-	orderRepo *repository.OrderRepository
+	productRepo *repository.ProductRepository
+	orderRepo   *repository.OrderRepository
 }
 
 // gRPC methods implementation
-func (s *OrderService) CreateOrder(userID uint64, productID uint64, amount float32) (*model.Order, error) {
+func (s *OrderService) CreateOrder(req *api.OrderRequest) (*model.Order, error) {
+	price, err := s.productRepo.GetPriceById(req.ProductId)
+	if err != nil {
+		return nil, err
+	}
+
 	order := &model.Order{
-		OrderSN:   utils.GenerateOrderSN(userID),
-		UserID:    userID,
-		ProductID: productID,
-		Amount:    amount,
+		OrderSN:   utils.GenerateOrderSN(req.UserId),
+		UserID:    req.UserId,
+		ProductID: req.ProductId,
+		Amount:    float32(req.Quantity) * price,
 		Status:    1,
 	}
 
@@ -30,3 +37,7 @@ func (s *OrderService) CreateOrder(userID uint64, productID uint64, amount float
 
 	return order, nil
 }
+
+// func (s *OrderService) CreateFlashOrder(req *api.FlashOrderRequest) (*api.OrderResponse, error) {
+
+// }

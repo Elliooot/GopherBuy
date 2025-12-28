@@ -2,16 +2,25 @@ syntax = "proto3";
 package api;
 option go_package = "./api";
 
-service FlashSaleService {
-    rpc RushBuy(RushBuyRequest) returns (RushBuyResponse);
+service OrderService {
+    rpc CreateFlashOrder(FlashOrderRequest) returns (OrderResponse);
+    rpc CreateOrder(OrderRequest) returns (OrderResponse);
 }
 
-message RushBuyRequest {
-    int64 user_id = 1;
-    int64 product_id = 2;
+message FlashOrderRequest {
+    uint64 user_id = 1;
+    uint64 product_id = 2;
+    uint64 promo_id = 3;
+    int32 quantity = 4;
 }
 
-message RushBuyResponse {
+message OrderRequest {
+    uint64 user_id = 1;
+    uint64 product_id = 2;
+    int32 quantity = 3;
+}
+
+message OrderResponse {
     int32 status = 1;
     string msg = 2;
     string order_sn = 3;
