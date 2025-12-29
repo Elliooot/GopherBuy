@@ -10,11 +10,9 @@ type ProductRepository struct {
 	db *gorm.DB
 }
 
-func (r *ProductRepository) GetPriceById(productId uint64) (float32, error) {
+// Canonical style, can use a generics type in the future
+func (r *ProductRepository) GetById(productId uint64) (*model.Product, error) {
 	var product model.Product
 	err := r.db.First(&product, productId).Error
-	if err != nil {
-		return 0, err
-	}
-	return product.Price, nil
+	return &product, err
 }

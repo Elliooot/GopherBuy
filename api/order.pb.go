@@ -26,7 +26,7 @@ type FlashOrderRequest struct {
 	UserId        uint64                 `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
 	ProductId     uint64                 `protobuf:"varint,2,opt,name=product_id,json=productId,proto3" json:"product_id,omitempty"`
 	PromoId       uint64                 `protobuf:"varint,3,opt,name=promo_id,json=promoId,proto3" json:"promo_id,omitempty"`
-	Quantity      int32                  `protobuf:"varint,4,opt,name=quantity,proto3" json:"quantity,omitempty"`
+	Quantity      uint32                 `protobuf:"varint,4,opt,name=quantity,proto3" json:"quantity,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -82,7 +82,7 @@ func (x *FlashOrderRequest) GetPromoId() uint64 {
 	return 0
 }
 
-func (x *FlashOrderRequest) GetQuantity() int32 {
+func (x *FlashOrderRequest) GetQuantity() uint32 {
 	if x != nil {
 		return x.Quantity
 	}
@@ -93,7 +93,7 @@ type OrderRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	UserId        uint64                 `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
 	ProductId     uint64                 `protobuf:"varint,2,opt,name=product_id,json=productId,proto3" json:"product_id,omitempty"`
-	Quantity      int32                  `protobuf:"varint,3,opt,name=quantity,proto3" json:"quantity,omitempty"`
+	Quantity      uint32                 `protobuf:"varint,3,opt,name=quantity,proto3" json:"quantity,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -142,7 +142,7 @@ func (x *OrderRequest) GetProductId() uint64 {
 	return 0
 }
 
-func (x *OrderRequest) GetQuantity() int32 {
+func (x *OrderRequest) GetQuantity() uint32 {
 	if x != nil {
 		return x.Quantity
 	}
@@ -219,12 +219,12 @@ const file_api_order_proto_rawDesc = "" +
 	"\n" +
 	"product_id\x18\x02 \x01(\x04R\tproductId\x12\x19\n" +
 	"\bpromo_id\x18\x03 \x01(\x04R\apromoId\x12\x1a\n" +
-	"\bquantity\x18\x04 \x01(\x05R\bquantity\"b\n" +
+	"\bquantity\x18\x04 \x01(\rR\bquantity\"b\n" +
 	"\fOrderRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\x04R\x06userId\x12\x1d\n" +
 	"\n" +
 	"product_id\x18\x02 \x01(\x04R\tproductId\x12\x1a\n" +
-	"\bquantity\x18\x03 \x01(\x05R\bquantity\"T\n" +
+	"\bquantity\x18\x03 \x01(\rR\bquantity\"T\n" +
 	"\rOrderResponse\x12\x16\n" +
 	"\x06status\x18\x01 \x01(\x05R\x06status\x12\x10\n" +
 	"\x03msg\x18\x02 \x01(\tR\x03msg\x12\x19\n" +
