@@ -7,17 +7,14 @@ import (
 )
 
 type OrderRepository struct {
+	*baseRepository[model.Order]
 	db *gorm.DB
 }
 
-func (r *OrderRepository) GetDB() *gorm.DB {
-	return r.db
-}
-
-func (r *OrderRepository) GetById(orderId uint64) (*model.Order, error) {
-	var order model.Order
-	err := r.db.First(&order, orderId).Error
-	return &order, err
+func NewOrderRepository(db *gorm.DB) *OrderRepository {
+	return &OrderRepository{
+		baseRepository: NewRepository[model.Order](db),
+	}
 }
 
 func (r *OrderRepository) Create(order *model.Order) error {

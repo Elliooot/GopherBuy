@@ -98,6 +98,10 @@ func (s *OrderService) CreateFlashOrder(req *api.FlashOrderRequest) (*api.OrderR
 		return tx.Create(order).Error
 	})
 
+	if err != nil {
+		return nil, err
+	}
+
 	return &api.OrderResponse{
 		Status:  201,
 		Msg:     "Order Created Successfully!",

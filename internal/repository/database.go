@@ -11,8 +11,10 @@ import (
 	"gorm.io/gorm"
 )
 
+var DB *gorm.DB // export global DB variable
+
 func InitDB() {
-	dsn := "host=localhost user=gorm password=gorm dbname=gorm port=9920 sslmode=disable TimeZone=Asia/Taipei"
+	dsn := "host=localhost user=gorm password=gorm dbname=gopherBuy port=5432 sslmode=disable TimeZone=Asia/Taipei"
 	// Dealing with the status that gorm connecting to sqlDB
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
@@ -28,7 +30,9 @@ func InitDB() {
 	sqlDB.SetMaxOpenConns(100)
 	sqlDB.SetConnMaxLifetime(time.Hour)
 
-	db.AutoMigrate(&model.User{}, &model.Product{}, &model.Order{})
+	DB = db
+
+	db.AutoMigrate(&model.User{}, &model.Product{}, &model.Order{}, &model.FlashSale{})
 
 	fmt.Printf("Database has been initialised and migrated")
 }
