@@ -6,6 +6,8 @@ import (
 	"GopherBuy/internal/repository"
 	"GopherBuy/pkg/utils"
 	"time"
+
+	"gorm.io/gorm"
 )
 
 type OrderService struct {
@@ -73,25 +75,28 @@ func (s *OrderService) CreateFlashOrder(req *api.FlashOrderRequest) (*api.OrderR
 		}, nil
 	}
 
-	if req.Quantity > flashsale.PromoStock {
-		return &api.OrderResponse{
-			Status: 400,
-			Msg:    "Exceeded stock",
-		}, nil
-	}
+	var order *model.Order // Define a nil pointer
+	// var order = &model.Order{} // Define an empty structure, a bit more waste memory
 
-	order := &model.Order{
-		OrderSN:   utils.GenerateOrderSN(req.UserId),
-		UserID:    req.UserId,
-		ProductID: req.ProductId,
-		Amount:    float32(req.Quantity) * flashsale.PromoPrice,
-		Status:    1,
-		CreatedAt: time.Now(),
-	}
+	err = s.orderRepo.GetDB().Transaction(func(tx *gorm.DB) error {
+		// Deduct Stock
+		if err := s.flashsaleRepo.DeductStock(req.PromoId, req.Quantity); err != nil {
+			return err
+		}
 
-	if err := s.orderRepo.Create(order); err != nil {
-		return nil, err
-	}
+		// Create Order
+		order = &model.Order{
+			OrderSN:   utils.GenerateOrderSN(req.UserId),
+			UserID:    req.UserId,
+			ProductID: req.ProductId,
+			Quantity:  req.Quantity,
+			Amount:    float32(req.Quantity) * flashsale.PromoPrice,
+			Status:    1,
+			CreatedAt: time.Now(),
+		}
+
+		return tx.Create(order).Error
+	})
 
 	return &api.OrderResponse{
 		Status:  201,

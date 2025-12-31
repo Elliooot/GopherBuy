@@ -10,6 +10,10 @@ type OrderRepository struct {
 	db *gorm.DB
 }
 
+func (r *OrderRepository) GetDB() *gorm.DB {
+	return r.db
+}
+
 func (r *OrderRepository) GetById(orderId uint64) (*model.Order, error) {
 	var order model.Order
 	err := r.db.First(&order, orderId).Error
