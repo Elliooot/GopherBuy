@@ -15,6 +15,7 @@ type OrderService struct {
 	productRepo   *repository.ProductRepository
 	orderRepo     *repository.OrderRepository
 	flashsaleRepo *repository.FlashSaleRepository
+	redisRepo     *repository.RedisRepository
 }
 
 // gRPC methods implementation

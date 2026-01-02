@@ -9,7 +9,6 @@ import (
 
 type FlashSaleRepository struct {
 	*baseRepository[model.FlashSale]
-	// db *gorm.DB
 }
 
 func NewFlashSaleRepository(db *gorm.DB) *FlashSaleRepository {
