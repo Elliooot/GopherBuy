@@ -13,7 +13,8 @@ import (
 var redisClient *redis.Client
 var redisOnce sync.Once
 
-func InitRedis() {
+func InitRedis() error {
+	var err error
 	redisOnce.Do(func() {
 		redisClient = redis.NewClient(&redis.Options{
 			Addr:         "localhost:6379", // Maybe read from .env?
@@ -34,6 +35,7 @@ func InitRedis() {
 		}
 		fmt.Println("Successfully connect to Redis!")
 	})
+	return err
 }
 
 func GetRedis() *redis.Client {

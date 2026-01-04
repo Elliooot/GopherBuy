@@ -26,27 +26,43 @@ func (r *RedisRepository) InitRedisRepo(promoId uint64, stock uint32) error {
 	return r.rdb.Set(ctx, key, stock, 24*time.Hour).Err()
 }
 
+func (r *RedisRepository) GetPromoStock(promoId uint64) uint32 {
+	ctx := context.Background()
+	key := fmt.Sprintf("flashsale:stock:%d", promoId)
+
+	result, err := r.rdb.Get(ctx, key).Int()
+	if err != nil {
+		fmt.Printf("Problem of getting stock")
+	}
+
+	return uint32(result)
+}
+
 func (r *RedisRepository) DeductStock(promoId uint64, quantity uint32) error {
 	ctx := context.Background()
 	key := fmt.Sprintf("flashsale:stock:%d", promoId)
 
-	// Implement Optimisitc Lock using Watch(), Bad Example
-	err := r.rdb.Watch(ctx, func(tx *redis.Tx) error {
-		stock, err := r.rdb.Get(ctx, key).Int()
+	// Embeded lua script
+	script := `
+		local stock = tonumber(redis.call("GET", KEYS[1]) or '0')
+		
+		if tonumber(ARGV[1]) > stock then
+			return -1
+		end
+		
+		redis.call("DECRBY", KEYS[1], ARGV[1])
+		return 0
+	`
 
-		if err != nil {
-			return err
-		}
+	result, err := r.rdb.Eval(ctx, script, []string{key}, quantity).Int()
 
-		if quantity > uint32(stock) {
-			return ErrStockInsufficient
-		}
-
-		_, err = tx.TxPipelined(ctx, func(pipe redis.Pipeliner) error {
-			pipe.DecrBy(ctx, key, int64(quantity))
-			return nil
-		})
+	if err != nil {
 		return err
-	}, key)
-	return err
+	}
+
+	if result == -1 {
+		return ErrStockInsufficient
+	}
+
+	return nil
 }

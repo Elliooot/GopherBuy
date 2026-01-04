@@ -15,7 +15,8 @@ import (
 var DB *gorm.DB
 var once sync.Once
 
-func InitDB() {
+func InitDB() error {
+	var err error
 	once.Do(func() {
 		dsn := "host=localhost user=gorm password=gorm dbname=gopherBuy port=5432 sslmode=disable TimeZone=Asia/Taipei"
 		// Dealing with the status that gorm connecting to sqlDB
@@ -39,4 +40,5 @@ func InitDB() {
 
 		fmt.Printf("Database has been initialised and migrated")
 	})
+	return err
 }

@@ -2,21 +2,24 @@ package main
 
 import (
 	"GopherBuy/internal/repository"
-
-	"github.com/gin-gonic/gin"
+	"log"
 )
 
 func main() {
-	router := gin.Default()
-	router.GET("/ping", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "pong",
-		})
-	})
-	router.Run() // listens on 0.0.0.0:8080 by default
+	if err := repository.InitDB(); err != nil {
+		log.Fatalf("Failed to init database: %v", err)
+	}
 
-	repository.InitDB()
-	repository.InitRedis()
+	if err := repository.InitRedis(); err != nil {
+		log.Fatalf("Failed to init Redis: %v", err)
+	}
 
-	// redis := repository.GetRedis()
+	kafkaConfig := &repository.KafkaConfig{
+		Brokers: []string{"localhost:9092", "localhost:9094"},
+		Topic:   "order_create",
+	}
+
+	if err := repository.InitKafka(kafkaConfig); err != nil {
+		log.Fatalf("Failed to init Kafka: %v", err)
+	}
 }
