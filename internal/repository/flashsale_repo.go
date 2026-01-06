@@ -17,8 +17,8 @@ func NewFlashSaleRepository(db *gorm.DB) *FlashSaleRepository {
 	}
 }
 
-func (r *FlashSaleRepository) DeductStock(promoId uint64, quantity uint32) error {
-	result := r.GetDB().Model(&model.FlashSale{}).
+func (r *FlashSaleRepository) DeductStock(tx *gorm.DB, promoId uint64, quantity uint32) error {
+	result := tx.Model(&model.FlashSale{}).
 		Where("id = ? AND promo_stock >= ?", promoId, quantity).
 		UpdateColumn("promo_stock", gorm.Expr("promo_stock - ?", quantity))
 

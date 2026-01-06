@@ -27,6 +27,7 @@ type FlashOrderRequest struct {
 	ProductId     uint64                 `protobuf:"varint,2,opt,name=product_id,json=productId,proto3" json:"product_id,omitempty"`
 	PromoId       uint64                 `protobuf:"varint,3,opt,name=promo_id,json=promoId,proto3" json:"promo_id,omitempty"`
 	Quantity      uint32                 `protobuf:"varint,4,opt,name=quantity,proto3" json:"quantity,omitempty"`
+	PromoPrice    float32                `protobuf:"fixed32,5,opt,name=promo_price,json=promoPrice,proto3" json:"promo_price,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -85,6 +86,13 @@ func (x *FlashOrderRequest) GetPromoId() uint64 {
 func (x *FlashOrderRequest) GetQuantity() uint32 {
 	if x != nil {
 		return x.Quantity
+	}
+	return 0
+}
+
+func (x *FlashOrderRequest) GetPromoPrice() float32 {
+	if x != nil {
+		return x.PromoPrice
 	}
 	return 0
 }
@@ -213,13 +221,15 @@ var File_api_order_proto protoreflect.FileDescriptor
 
 const file_api_order_proto_rawDesc = "" +
 	"\n" +
-	"\x0fapi/order.proto\x12\x03api\"\x82\x01\n" +
+	"\x0fapi/order.proto\x12\x03api\"\xa3\x01\n" +
 	"\x11FlashOrderRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\x04R\x06userId\x12\x1d\n" +
 	"\n" +
 	"product_id\x18\x02 \x01(\x04R\tproductId\x12\x19\n" +
 	"\bpromo_id\x18\x03 \x01(\x04R\apromoId\x12\x1a\n" +
-	"\bquantity\x18\x04 \x01(\rR\bquantity\"b\n" +
+	"\bquantity\x18\x04 \x01(\rR\bquantity\x12\x1f\n" +
+	"\vpromo_price\x18\x05 \x01(\x02R\n" +
+	"promoPrice\"b\n" +
 	"\fOrderRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\x04R\x06userId\x12\x1d\n" +
 	"\n" +
