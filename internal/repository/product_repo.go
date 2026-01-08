@@ -8,7 +8,13 @@ import (
 )
 
 type ProductRepository struct {
-	db *gorm.DB
+	*baseRepository[model.Product]
+}
+
+func NewProductRepository(db *gorm.DB) *ProductRepository {
+	return &ProductRepository{
+		baseRepository: &baseRepository[model.Product]{db: db},
+	}
 }
 
 // Canonical style, can use a generics type in the future

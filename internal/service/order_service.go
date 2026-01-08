@@ -19,6 +19,25 @@ type OrderService struct {
 	flashsaleRepo *repository.FlashSaleRepository
 	redisRepo     *repository.RedisRepository
 	kafkaRepo     *repository.KafkaRepository
+	asynqRepo     *repository.AsynqRepository
+}
+
+func NewOrderService(
+	productRepo *repository.ProductRepository,
+	orderRepo *repository.OrderRepository,
+	flashsaleRepo *repository.FlashSaleRepository,
+	redisRepo *repository.RedisRepository,
+	kafkaRepo *repository.KafkaRepository,
+	asynqRepo *repository.AsynqRepository,
+) *OrderService {
+	return &OrderService{
+		productRepo:   productRepo,
+		orderRepo:     orderRepo,
+		flashsaleRepo: flashsaleRepo,
+		redisRepo:     redisRepo,
+		kafkaRepo:     kafkaRepo,
+		asynqRepo:     asynqRepo,
+	}
 }
 
 // gRPC methods implementation
@@ -84,9 +103,11 @@ func (s *OrderService) HandleFlashSaleRequest(req *api.FlashOrderRequest) (*api.
 		return nil, err
 	}
 
+	orderSN := utils.GenerateOrderSN(req.UserId)
+
 	// Kafka Producer Publish Msg
 	event := repository.OrderCreatedEvent{
-		OrderSN:    utils.GenerateOrderSN(req.UserId),
+		OrderSN:    orderSN,
 		UserID:     req.UserId,
 		ProductID:  req.ProductId,
 		PromoID:    req.PromoId,
@@ -101,7 +122,16 @@ func (s *OrderService) HandleFlashSaleRequest(req *api.FlashOrderRequest) (*api.
 		return nil, err
 	}
 
-	return &api.OrderResponse{Status: 202, OrderSn: event.OrderSN, Msg: "Order In Queue"}, nil
+	// Send an Order Timeout message to Asynq
+	if err := s.asynqRepo.EnqueueOrderExpiration(orderSN, req.PromoId, req.Quantity); err != nil {
+		log.Printf("Warning: failed to enqueue expiration task: %v\n", err)
+	}
+
+	return &api.OrderResponse{
+		Status:  202,
+		OrderSn: event.OrderSN,
+		Msg:     "Order In Queue",
+	}, nil
 }
 
 func (s *OrderService) CreateFlashOrder(req *api.FlashOrderRequest) (*api.OrderResponse, error) {

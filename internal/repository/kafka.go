@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"sync"
@@ -43,6 +44,15 @@ func InitKafka(config *KafkaConfig) error {
 			RequiredAcks: kafka.RequireAll, // Await for all followers in the ISR(In-Sync Replicas)
 			Compression:  kafka.Snappy,     // Compression Strategy
 		}
+
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+
+		conn, err := kafka.DialLeader(ctx, "tcp", config.Brokers[0], config.Topic, 0)
+		if err != nil {
+			log.Fatalf("Failed to  connect to Kafka: %v\n", err)
+		}
+		conn.Close()
 
 		fmt.Println("Successfully initialize Kafka!")
 	})

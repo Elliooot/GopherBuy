@@ -8,7 +8,6 @@ import (
 
 type OrderRepository struct {
 	*baseRepository[model.Order]
-	db *gorm.DB
 }
 
 func NewOrderRepository(db *gorm.DB) *OrderRepository {

@@ -13,7 +13,7 @@ type FlashSaleRepository struct {
 
 func NewFlashSaleRepository(db *gorm.DB) *FlashSaleRepository {
 	return &FlashSaleRepository{
-		baseRepository: (*baseRepository[model.FlashSale])(NewRepository[model.FlashSale](db)),
+		baseRepository: NewRepository[model.FlashSale](db),
 	}
 }
 
@@ -30,5 +30,14 @@ func (r *FlashSaleRepository) DeductStock(tx *gorm.DB, promoId uint64, quantity 
 		return errors.New("insufficient stock")
 	}
 
+	return nil
+}
+
+func (r *FlashSaleRepository) RollBackStock(tx *gorm.DB, promoId uint64, quantity uint32) error {
+	result := r.db.Where("id = ?", promoId).
+		Update("promo_stock", gorm.Expr("promo_stock + ?", quantity))
+	if result.Error != nil {
+		return result.Error
+	}
 	return nil
 }
