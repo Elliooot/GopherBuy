@@ -3,6 +3,7 @@ package repository
 import (
 	"fmt"
 	"log"
+	"os"
 	"sync"
 	"time"
 
@@ -18,7 +19,16 @@ var once sync.Once
 func InitDB() error {
 	var err error
 	once.Do(func() {
-		dsn := "host=localhost user=gorm password=gorm dbname=gopherBuy port=5432 sslmode=disable TimeZone=Asia/Taipei"
+		// dsn := "host=localhost user=gorm password=gorm dbname=gopherBuy port=5432 sslmode=disable TimeZone=Asia/Taipei"
+		host := os.Getenv("POSTGRES_HOST")
+		port := os.Getenv("POSTGRES_PORT")
+		user := os.Getenv("POSTGRES_USER")
+		pw := os.Getenv("POSTGRES_PASSWORD")
+		dbname := os.Getenv("POSTGRES_DB")
+
+		dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Taipei",
+			host, user, pw, dbname, port)
+
 		// Dealing with the status that gorm connecting to sqlDB
 		db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 		if err != nil {

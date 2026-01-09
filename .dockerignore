@@ -1,0 +1,13 @@
+target/
+.mvn/
+mvnw
+mvnw.cmd
+.git
+.gitignore
+Dockerfile
+.dockerignore
+*.log
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local

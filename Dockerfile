@@ -1,5 +1,5 @@
 # Build stage
-FROM golang:1.23-alpine AS build
+FROM golang:1.25-alpine AS build
 
 WORKDIR /app
 
@@ -25,8 +25,8 @@ WORKDIR /app
 RUN apk --no-cache add ca-certificates
 
 # Copy binary from builder
-COPY --from=builder /app/main .
-COPY --from=builder /app/.env .env
+COPY --from=build /app/main .
+# COPY --from=build /app/.env .env
 
 EXPOSE 50051
 
