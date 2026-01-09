@@ -40,15 +40,30 @@ func NewOrderService(
 	}
 }
 
+func (s *OrderService) GetOrder(req *api.GetOrderRequest) (*api.GetOrderResponse, error) {
+	order, err := s.orderRepo.GetById(req.OrderId)
+	if err != nil {
+		return nil, err
+	}
+
+	return &api.GetOrderResponse{
+		Status:      order.Status,
+		Quantity:    order.Quantity,
+		OrderSn:     order.OrderSN,
+		Amount:      order.Amount,
+		ExpiredTime: order.ExpiredAt.Unix(),
+	}, nil
+}
+
 // gRPC methods implementation
-func (s *OrderService) CreateOrder(req *api.OrderRequest) (*api.OrderResponse, error) {
+func (s *OrderService) CreateOrder(req *api.OrderRequest) (*api.CreateOrderResponse, error) {
 	product, err := s.productRepo.GetById(req.ProductId)
 	if err != nil {
 		return nil, err
 	}
 
 	if req.Quantity > product.MaxPurchase {
-		return &api.OrderResponse{
+		return &api.CreateOrderResponse{
 			Status: 400,
 			Msg:    "Exceeded purchase limit",
 		}, nil
@@ -70,14 +85,14 @@ func (s *OrderService) CreateOrder(req *api.OrderRequest) (*api.OrderResponse, e
 		return nil, err
 	}
 
-	return &api.OrderResponse{
+	return &api.CreateOrderResponse{
 		Status:  201,
 		Msg:     "Order Created Successfully!",
 		OrderSn: order.OrderSN,
 	}, nil
 }
 
-func (s *OrderService) HandleFlashSaleRequest(req *api.FlashOrderRequest) (*api.OrderResponse, error) {
+func (s *OrderService) HandleFlashSaleRequest(req *api.FlashOrderRequest) (*api.CreateOrderResponse, error) {
 	flashsale, err := s.redisRepo.GetFlashSale(req.PromoId)
 	if err != nil {
 		return nil, err
@@ -85,14 +100,14 @@ func (s *OrderService) HandleFlashSaleRequest(req *api.FlashOrderRequest) (*api.
 
 	now := time.Now()
 	if now.Before(flashsale.StartTime) || now.After(flashsale.EndTime) {
-		return &api.OrderResponse{
+		return &api.CreateOrderResponse{
 			Status: 400,
 			Msg:    "Not in the flashsale duration",
 		}, nil
 	}
 
 	if req.Quantity > flashsale.MaxPurchase {
-		return &api.OrderResponse{
+		return &api.CreateOrderResponse{
 			Status: 400,
 			Msg:    "Exceeded purchase limit",
 		}, nil
@@ -127,14 +142,14 @@ func (s *OrderService) HandleFlashSaleRequest(req *api.FlashOrderRequest) (*api.
 		log.Printf("Warning: failed to enqueue expiration task: %v\n", err)
 	}
 
-	return &api.OrderResponse{
+	return &api.CreateOrderResponse{
 		Status:  202,
 		OrderSn: event.OrderSN,
 		Msg:     "Order In Queue",
 	}, nil
 }
 
-func (s *OrderService) CreateFlashOrder(req *api.FlashOrderRequest) (*api.OrderResponse, error) {
+func (s *OrderService) CreateFlashOrder(req *api.FlashOrderRequest) (*api.CreateOrderResponse, error) {
 	var order *model.Order // Define a nil pointer
 	// var order = &model.Order{} // Define an empty structure, a bit more waste memory
 
@@ -173,7 +188,7 @@ func (s *OrderService) CreateFlashOrder(req *api.FlashOrderRequest) (*api.OrderR
 		return nil, err
 	}
 
-	return &api.OrderResponse{
+	return &api.CreateOrderResponse{
 		Status:  201,
 		Msg:     "Order Created Successfully!",
 		OrderSn: order.OrderSN,

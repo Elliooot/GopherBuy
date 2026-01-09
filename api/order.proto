@@ -3,8 +3,10 @@ package api;
 option go_package = "./api";
 
 service OrderService {
-    rpc CreateFlashOrder(FlashOrderRequest) returns (OrderResponse);
-    rpc CreateOrder(OrderRequest) returns (OrderResponse);
+    rpc CreateFlashOrder(FlashOrderRequest) returns (CreateOrderResponse);
+    rpc CreateOrder(OrderRequest) returns (CreateOrderResponse);
+    rpc GetOrder(GetOrderRequest) returns (GetOrderResponse);
+    rpc CreateFlashSale(CreateFlashSaleRequest) returns (CreateFlashSaleResponse);
 }
 
 message FlashOrderRequest {
@@ -21,8 +23,33 @@ message OrderRequest {
     uint32 quantity = 3;
 }
 
-message OrderResponse {
+message CreateOrderResponse {
     int32 status = 1;
     string msg = 2;
     string order_sn = 3;
+}
+
+message GetOrderRequest {
+    uint64 order_id = 1;
+}
+
+message GetOrderResponse {
+    int32 status = 1;
+    uint32 quantity = 2;
+    string order_sn = 3;
+    float amount = 4;
+    int64 expired_time = 5;
+}
+
+message CreateFlashSaleRequest {
+    uint64 product_id = 1;
+    float promo_price = 2;
+    uint32 promo_stock = 3;
+    uint32 max_purchase = 4;
+    int64 start_time = 5;
+    int64 end_time = 6;
+}
+
+message CreateFlashSaleResponse {
+    string msg = 1;
 }

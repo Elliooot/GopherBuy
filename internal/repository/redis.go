@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os"
 	"sync"
 	"time"
 
@@ -16,9 +17,11 @@ var redisOnce sync.Once
 func InitRedis() error {
 	var err error
 	redisOnce.Do(func() {
+		addr := os.Getenv("REDIS_HOST") + ":" + os.Getenv("REDIS_PORT")
+
 		redisClient = redis.NewClient(&redis.Options{
-			Addr:         "localhost:6379", // Maybe read from .env?
-			Password:     "",               // Maybe read from .env?
+			Addr:         addr,
+			Password:     os.Getenv("REDIS_PASSWORD"),
 			DB:           0,
 			PoolSize:     100,
 			MinIdleConns: 10,

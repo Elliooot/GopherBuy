@@ -16,7 +16,7 @@ type RedisRepository struct {
 	rdb *redis.Client
 }
 
-type flashSaleDTO struct {
+type FlashSaleDTO struct {
 	PromoId     uint64
 	PromoStock  uint32
 	MaxPurchase uint32
@@ -28,7 +28,7 @@ func NewRedisRepository(rdb *redis.Client) *RedisRepository {
 	return &RedisRepository{rdb: rdb}
 }
 
-func (r *RedisRepository) SyncFlashSaleFromDB(flashSale flashSaleDTO) error {
+func (r *RedisRepository) SyncFlashSaleFromDB(flashSale FlashSaleDTO) error {
 	ctx := context.Background()
 	key := fmt.Sprintf("flashsale:stock:%d", flashSale.PromoId)
 
@@ -48,7 +48,7 @@ func (r *RedisRepository) SyncFlashSaleFromDB(flashSale flashSaleDTO) error {
 	return r.rdb.Expire(ctx, key, ttl).Err()
 }
 
-func (r *RedisRepository) GetFlashSale(promoId uint64) (*flashSaleDTO, error) {
+func (r *RedisRepository) GetFlashSale(promoId uint64) (*FlashSaleDTO, error) {
 	ctx := context.Background()
 	key := fmt.Sprintf("flashsale:stock:%d", promoId)
 
@@ -67,7 +67,7 @@ func (r *RedisRepository) GetFlashSale(promoId uint64) (*flashSaleDTO, error) {
 	startTime, _ := strconv.ParseInt(result["start_time"], 10, 64)
 	endTime, _ := strconv.ParseInt(result["end_time"], 10, 64)
 
-	return &flashSaleDTO{
+	return &FlashSaleDTO{
 		PromoId:     promoId,
 		PromoStock:  uint32(promoStock),
 		MaxPurchase: uint32(maxPurchase),

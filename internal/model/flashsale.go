@@ -10,5 +10,5 @@ type FlashSale struct {
 	MaxPurchase uint32
 	StartTime   time.Time
 	EndTime     time.Time
-	Version     uint32
+	IsWarmed    bool `gorm:"default:false"`
 }

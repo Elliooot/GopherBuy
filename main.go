@@ -1,18 +1,27 @@
 package main
 
 import (
+	"GopherBuy/api"
+	"GopherBuy/internal/handler"
 	"GopherBuy/internal/repository"
 	"GopherBuy/internal/service"
 	"GopherBuy/internal/worker"
+	"context"
 	"log"
+	"net"
+	"os"
 
 	"github.com/hibiken/asynq"
+	"github.com/joho/godotenv"
+	"google.golang.org/grpc"
 )
 
 type Dependencies struct {
-	OrderService  *service.OrderService
-	AsynqRepo     *repository.AsynqRepository
-	orderConsumer *worker.OrderConsumer
+	OrderService     *service.OrderService
+	AsynqRepo        *repository.AsynqRepository
+	OrderConsumer    *worker.OrderConsumer
+	WarmUpWorker     *worker.WarmUpWorker
+	GrpcOrderHandler *handler.GrpcOrderHandler
 }
 
 func main() {
@@ -20,12 +29,20 @@ func main() {
 	initInfrastructure()
 	deps := initDependencies()
 
-	go deps.orderConsumer.StartOrderConsumer(10)
+	go deps.OrderConsumer.StartOrderConsumer(10)
+	go deps.WarmUpWorker.Start(context.Background())
 
 	go startAsynqWorker(deps.AsynqRepo)
+
+	startGRPCServerNonBlocking(deps.GrpcOrderHandler)
 }
 
 func initInfrastructure() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
 	if err := repository.InitDB(); err != nil {
 		log.Fatalf("Failed to init database: %v", err)
 	}
@@ -35,8 +52,8 @@ func initInfrastructure() {
 	}
 
 	kafkaConfig := &repository.KafkaConfig{
-		Brokers: []string{"localhost:9092", "localhost:9094"},
-		Topic:   "order_create",
+		Brokers: []string{os.Getenv("KAFKA_BROKERS")},
+		Topic:   os.Getenv("KAFKA_TOPIC"),
 	}
 
 	if err := repository.InitKafka(kafkaConfig); err != nil {
@@ -44,8 +61,8 @@ func initInfrastructure() {
 	}
 
 	asynqConfig := &repository.AsynqConfig{
-		Addr:     "localhost:6379",
-		Password: "",
+		Addr:     os.Getenv("ASYNQ_REDIS_HOST") + ":" + os.Getenv("ASYNQ_REDIS_PORT"),
+		Password: os.Getenv("ASYNQ_REDIS_PASSWORD"),
 		DB:       2,
 	}
 
@@ -72,11 +89,16 @@ func initDependencies() *Dependencies {
 	orderService := service.NewOrderService(productRepo, orderRepo, flashsaleRepo, redisRepo, kafkaRepo, asynqRepo)
 
 	orderConsumer := worker.NewOrderConsumer(kafkaConsumer, orderService)
+	warmUpWorker := worker.NewWarmUpWorker(flashsaleRepo, redisRepo)
+
+	grpcOrderhandler := handler.NewGrpcOrderHandler(orderService)
 
 	return &Dependencies{
-		OrderService:  orderService,
-		AsynqRepo:     asynqRepo,
-		orderConsumer: orderConsumer,
+		OrderService:     orderService,
+		AsynqRepo:        asynqRepo,
+		OrderConsumer:    orderConsumer,
+		WarmUpWorker:     warmUpWorker,
+		GrpcOrderHandler: grpcOrderhandler,
 	}
 }
 
@@ -90,4 +112,23 @@ func startAsynqWorker(asynqRepo *repository.AsynqRepository) {
 	if err := server.Run(mux); err != nil {
 		log.Fatalf("Failed to start Asynq worker: %v", err)
 	}
+}
+
+func startGRPCServerNonBlocking(orderHandler *handler.GrpcOrderHandler) *grpc.Server {
+	lis, err := net.Listen("tcp", ":50051")
+	if err != nil {
+		log.Fatalf("Failed to listen: %v", err)
+	}
+
+	grpcServer := grpc.NewServer()
+	api.RegisterOrderServiceServer(grpcServer, orderHandler)
+
+	go func() {
+		if err := grpcServer.Serve(lis); err != nil {
+			log.Fatalf("Failed to serve: %v", err)
+		}
+		log.Println("gRPC Server started on port 50051")
+	}()
+
+	return grpcServer
 }
