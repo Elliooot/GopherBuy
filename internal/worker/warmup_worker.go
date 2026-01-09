@@ -51,7 +51,7 @@ func (w *WarmUpWorker) scanAndWarmUp() {
 		}
 
 		err := w.redisRepo.SyncFlashSaleFromDB(repository.FlashSaleDTO{
-			PromoId:     fs.ID,
+			PromoID:     fs.ID,
 			PromoStock:  fs.PromoStock,
 			MaxPurchase: fs.MaxPurchase,
 			StartTime:   fs.StartTime,

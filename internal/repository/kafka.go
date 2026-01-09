@@ -26,13 +26,15 @@ func InitKafka(config *KafkaConfig) error {
 	kafkaOnce.Do(func() {
 		// Initialize Consumer
 		kafkaConsumer = kafka.NewReader(kafka.ReaderConfig{
-			Brokers:        config.Brokers,
-			Topic:          config.Topic,
-			GroupID:        "gopherbuy-consumer-group",
-			MinBytes:       10e3,
-			MaxBytes:       10e6,
-			CommitInterval: time.Second,
-			StartOffset:    kafka.LastOffset,
+			Brokers:           config.Brokers,
+			Topic:             config.Topic,
+			GroupID:           "gopherbuy-consumer-group",
+			MinBytes:          10e3,
+			MaxBytes:          10e6,
+			CommitInterval:    time.Second,
+			SessionTimeout:    30 * time.Second,
+			HeartbeatInterval: 3 * time.Second,
+			StartOffset:       kafka.LastOffset,
 		})
 
 		kafkaProducer = &kafka.Writer{

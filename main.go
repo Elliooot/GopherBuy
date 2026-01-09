@@ -10,6 +10,8 @@ import (
 	"log"
 	"net"
 	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/hibiken/asynq"
 	"github.com/joho/godotenv"
@@ -29,18 +31,22 @@ func main() {
 	initInfrastructure()
 	deps := initDependencies()
 
-	go deps.OrderConsumer.StartOrderConsumer(10)
-	go deps.WarmUpWorker.Start(context.Background())
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
+	go deps.OrderConsumer.StartOrderConsumer(10)
+	go deps.WarmUpWorker.Start(ctx)
 	go startAsynqWorker(deps.AsynqRepo)
 
-	startGRPCServerNonBlocking(deps.GrpcOrderHandler)
+	grpcServer := startGRPCServerNonBlocking(deps.GrpcOrderHandler)
+
+	gracefulShutdown(cancel, grpcServer)
 }
 
 func initInfrastructure() {
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		log.Println("No .env file found, using environment variables from system")
 	}
 
 	if err := repository.InitDB(); err != nil {
@@ -131,4 +137,37 @@ func startGRPCServerNonBlocking(orderHandler *handler.GrpcOrderHandler) *grpc.Se
 	}()
 
 	return grpcServer
+}
+
+func gracefulShutdown(cancel context.CancelFunc, grpcServer *grpc.Server) {
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
+	<-sigChan
+
+	log.Println("Shutting down gracefully...")
+
+	// Cancel context
+	cancel()
+
+	log.Println("Stopping gRPC server")
+	grpcServer.GracefulStop()
+
+	log.Println("Stopping Asynq...")
+	if err := repository.CloseAsynq(); err != nil {
+		log.Printf("Error closing Asynq: %v", err)
+	}
+
+	log.Println("Stopping Kafka...")
+	if err := repository.CloseKafka(); err != nil {
+		log.Printf("Error closing Kafka: %v", err)
+	}
+
+	log.Println("Closing database...")
+	if db := repository.DB; db != nil {
+		sqlDB, _ := db.DB()
+		sqlDB.Close()
+	}
+
+	log.Println("All services stopped")
+	os.Exit(0)
 }

@@ -17,7 +17,7 @@ type RedisRepository struct {
 }
 
 type FlashSaleDTO struct {
-	PromoId     uint64
+	PromoID     uint64
 	PromoStock  uint32
 	MaxPurchase uint32
 	StartTime   time.Time
@@ -30,7 +30,7 @@ func NewRedisRepository(rdb *redis.Client) *RedisRepository {
 
 func (r *RedisRepository) SyncFlashSaleFromDB(flashSale FlashSaleDTO) error {
 	ctx := context.Background()
-	key := fmt.Sprintf("flashsale:stock:%d", flashSale.PromoId)
+	key := fmt.Sprintf("flashsale:stock:%d", flashSale.PromoID)
 
 	err := r.rdb.HSet(ctx, key, map[string]interface{}{
 		"promo_stock":  flashSale.PromoStock,
@@ -68,7 +68,7 @@ func (r *RedisRepository) GetFlashSale(promoId uint64) (*FlashSaleDTO, error) {
 	endTime, _ := strconv.ParseInt(result["end_time"], 10, 64)
 
 	return &FlashSaleDTO{
-		PromoId:     promoId,
+		PromoID:     promoId,
 		PromoStock:  uint32(promoStock),
 		MaxPurchase: uint32(maxPurchase),
 		StartTime:   time.Unix(startTime, 0),
@@ -80,7 +80,7 @@ func (r *RedisRepository) GetPromoStock(promoId uint64) uint32 {
 	ctx := context.Background()
 	key := fmt.Sprintf("flashsale:stock:%d", promoId)
 
-	result, err := r.rdb.Get(ctx, key).Int()
+	result, err := r.rdb.HGet(ctx, key, "promo_stock").Int()
 	if err != nil {
 		fmt.Printf("Problem of getting stock")
 	}
@@ -94,13 +94,13 @@ func (r *RedisRepository) DeductStock(promoId uint64, quantity uint32) error {
 
 	// Embeded lua script
 	script := `
-		local stock = tonumber(redis.call("GET", KEYS[1]) or '0')
+		local stock = tonumber(redis.call("HGET", KEYS[1], "promo_stock") or '0')
 		
 		if tonumber(ARGV[1]) > stock then
 			return -1
 		end
 		
-		redis.call("DECRBY", KEYS[1], ARGV[1])
+		redis.call("HINCRBY", KEYS[1], "promo_stock", -ARGV[1])
 		return 0
 	`
 
@@ -121,7 +121,7 @@ func (r *RedisRepository) RollBackStock(promoId uint64, quantity uint32) error {
 	ctx := context.Background()
 	key := fmt.Sprintf("flashsale:stock:%d", promoId)
 
-	result, err := r.rdb.IncrBy(ctx, key, int64(quantity)).Result()
+	result, err := r.rdb.HIncrBy(ctx, key, "promo_stock", int64(quantity)).Result()
 
 	if err != nil {
 		return err

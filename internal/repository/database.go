@@ -21,12 +21,16 @@ func InitDB() error {
 	once.Do(func() {
 		// dsn := "host=localhost user=gorm password=gorm dbname=gopherBuy port=5432 sslmode=disable TimeZone=Asia/Taipei"
 		host := os.Getenv("POSTGRES_HOST")
+		if host == "" {
+			host = "localhost"
+		}
+
 		port := os.Getenv("POSTGRES_PORT")
 		user := os.Getenv("POSTGRES_USER")
 		pw := os.Getenv("POSTGRES_PASSWORD")
 		dbname := os.Getenv("POSTGRES_DB")
 
-		dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Taipei",
+		dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable",
 			host, user, pw, dbname, port)
 
 		// Dealing with the status that gorm connecting to sqlDB
@@ -48,7 +52,7 @@ func InitDB() error {
 
 		db.AutoMigrate(&model.User{}, &model.Product{}, &model.Order{}, &model.FlashSale{})
 
-		fmt.Printf("Database has been initialised and migrated")
+		fmt.Println("Database has been initialised and migrated")
 	})
 	return err
 }
