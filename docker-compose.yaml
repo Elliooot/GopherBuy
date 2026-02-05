@@ -2,6 +2,8 @@ services:
   postgres-db:
     image: postgres:15-alpine
     container_name: gopherbuy-postgres
+    environment:
+      - TZ=UTC
     env_file:
       - ./.env
     ports:
@@ -19,6 +21,8 @@ services:
   redis-cache:
     image: redis:7-alpine
     container_name: gopherbuy-redis
+    environment:
+      - TZ=UTC
     ports:
       - "6379:6379"
     command: ["redis-server", "--appendonly", "yes"] # Enable AOF persistence
@@ -69,6 +73,8 @@ services:
       - "50051:50051"
     env_file:
       - ./.env
+    environment:
+      - TZ=UTC
     depends_on:
       postgres-db:
         condition: service_healthy

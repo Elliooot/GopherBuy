@@ -92,7 +92,7 @@ func (r *RedisRepository) DeductStock(promoId uint64, quantity uint32) error {
 	ctx := context.Background()
 	key := fmt.Sprintf("flashsale:stock:%d", promoId)
 
-	// Embeded lua script
+	// Embedded lua script
 	script := `
 		local stock = tonumber(redis.call("HGET", KEYS[1], "promo_stock") or '0')
 		
