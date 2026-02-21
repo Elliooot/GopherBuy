@@ -28,6 +28,11 @@ func InitRedis() error {
 			ReadTimeout:  3 * time.Second,
 			WriteTimeout: 3 * time.Second,
 			PoolTimeout:  4 * time.Second,
+
+			// Retry Mechanism
+			MaxRetries:      3,
+			MinRetryBackoff: 8 * time.Millisecond,
+			MaxRetryBackoff: 512 * time.Millisecond,
 		})
 
 		ctx := context.Background()
